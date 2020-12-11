@@ -1,0 +1,4 @@
+sexo,plaquetas,k
+M,86,hg
+F,12,gh
+M,45,das

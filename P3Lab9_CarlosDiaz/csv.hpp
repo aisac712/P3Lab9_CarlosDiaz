@@ -22,6 +22,8 @@ using std::vector;
 using std::ifstream;
 using std::ofstream;
 
+#include <bits/stdc++.h>            //lib de tokenizer tipo java
+
 class csv {
 public:
     csv(){                                                          //constructor vacío
@@ -47,8 +49,35 @@ public:
         
     }
     
-    void load_file(bool header){
+    void load_file(bool header) {
+        int x=0;
+        data_count=0;
+        lectura.open(file_name);
+        while (!lectura.eof()) {
+            string linea;
+            lectura >> linea;
+            //cout << linea << endl;
+
+            if(x==0){
+                for (auto i = strtok(&linea[0], ","); i != NULL; i = strtok(NULL, ",")){
+                    headers.push_back(i);
+                }
+                //cout << headers[0] << " " << headers[1] << endl;;
+
+            } else{
+                vector<string> columna;
+                for (auto i = strtok(&linea[0], ","); i != NULL; i = strtok(NULL, ",")){
+                    columna.push_back(i);
+                }
+                //cout << columna[0] << " " << columna[1] << endl;
+                data.push_back(columna);
+            }
+            x++;
+            data_count++;
+        }
+        lectura.close();
         
+        cout << "Número de registros: " << data_count << endl;
     }
     
     vector< vector<string> > sort_data(int column, bool up){        //si up es true se hace ascendentemente, de lo contrario lo ordena de manera descendente
@@ -83,35 +112,74 @@ public:
     
     vector<string> getMax(int columnIndex){
         vector<string> rowMax;
-        return rowMax;
+        string mayor = data[0][columnIndex];
+        int correspondentRow=0;
+        
+        for(int i=0; i<data.size(); i++){
+            if(data[i][columnIndex]>mayor){
+                mayor = data[i][columnIndex];
+                correspondentRow = i;
+            }
+        }
+        
+        cout << "esta en " << correspondentRow << endl;
+        return data[correspondentRow];
     }
     
     vector<string> getMin(int columnIndex){
         vector<string> rowMin;
-        return rowMin;
+        string menor = data[0][columnIndex];
+        int correspondentRow=0;
+        
+        for(int i=0; i<data.size(); i++){
+            if(data[i][columnIndex]<menor){
+                menor = data[i][columnIndex];
+                correspondentRow = i;
+            }
+        }
+        
+        cout << "esta en " << correspondentRow << endl;
+        return data[correspondentRow];
     }
     
     void printData(){
         int MAXWIDTH=0;
         
-        if(headers.size()==0){
-            MAXWIDTH = headers[0].length()+3;
+        if(headers.size()!=0){
+            MAXWIDTH = headers[0].length()+8;                       //o el string mas largo+1
             for(int i=0; i<headers.size(); i++){
                 cout << left << setw(MAXWIDTH) << setfill(' ') << headers[i];
             }
             cout << " " << endl;                                    //salto de linea entre filas
         } else
-            MAXWIDTH = (data.at(0).at(0)).length()+3;
+            MAXWIDTH = (data.at(0).at(0)).length()+8;
         
-        if(data.size()==0){
+        if(data.size()!=0){
             for(int i=0; i<data.size(); i++){
-                for(int j=0; j<data.size(); j++){
+                for(int j=0; j<data[i].size(); j++){
                     cout << left << setw(MAXWIDTH) << setfill(' ') << data.at(i).at(j);
                 }
                 cout << " " << endl;                                //salto de linea entre filas
             }
             cout << " " << endl;                                    //salto estético
         }
+    }
+    
+    void truncate_column(int columnIndex){
+        for(int i=0; data.size(); i++){
+            //data[i][columnIndex].erase(data[i][columnIndex].begin + columnIndex);
+        }
+    }
+    
+    void truncate_row(int rowIndex){
+        data.erase(data.begin() + rowIndex);
+    }
+    
+    void printVector(vector<string> victor){                        //sirve para comprobar metodos
+        for(int i=0; i<victor.size(); i++){
+            cout << victor[i] << " ";
+        }
+        cout << " " << endl;
     }
     
     
@@ -142,6 +210,9 @@ private:
     vector<string> headers;
     vector< vector<string> > data;
     int data_count;
+    
+    ifstream lectura;
+    ofstream escritura;
 };
 
 #endif /* CSV_HPP */
